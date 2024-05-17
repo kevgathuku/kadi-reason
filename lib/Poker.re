@@ -170,17 +170,22 @@ let transition = (action, state: state) =>
           ~blocklist=state.start_cards_blocklist,
         );
       let remaining_deck = List.filter(x => x != start_card, state.deck);
-      {...state, status: Live, deck: remaining_deck, played_stack: [start_card]};
+      {
+        ...state,
+        status: Live,
+        deck: remaining_deck,
+        played_stack: [start_card],
+      };
     | _ => state
     }
   | Live =>
     switch (action) {
-    | PlayHand => Kadi
+    | PlayHand => {...state, status: Kadi}
     | _ => state
     }
   | Kadi =>
     switch (action) {
-    | PlayHand => GameOver
+    | PlayHand => {...state, status: GameOver}
     | _ => state
     }
   | GameOver => state
