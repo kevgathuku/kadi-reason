@@ -1,0 +1,3 @@
+(library
+ (name lib)
+ (synopsis "Provides a greeting function"))

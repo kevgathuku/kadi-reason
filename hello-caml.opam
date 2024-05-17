@@ -1,0 +1,34 @@
+opam-version: "2.0"
+maintainer: "kevgathuku@users.noreply.github.com"
+authors: ["Kevin"]
+
+homepage: "https://github.com/kevgathuku/hello-caml"
+bug-reports: "https://github.com/kevgathuku/hello-caml/issues"
+dev-repo: "git+https://github.com/kevgathuku/hello-caml.git"
+version: "dev"
+
+# TODO Pick the relevant SPDX identifier <https://spdx.org/licenses/>
+license: "Unlicense"
+
+synopsis: "An Ocaml + Reaason starter project"
+
+description: """
+An Ocaml + Reaason starter project
+"""
+
+build: [
+  ["dune" "build" "-p" name "-j" jobs]
+]
+
+depends: [
+  "base"
+  "core"
+  "stdio"
+  "dune"
+  "merlin-extend"
+  "reason"
+  "utop"
+  "ounit2"
+  "ocamlformat"
+  "ppx_inline_test" { >= "0.16.0" }
+]
