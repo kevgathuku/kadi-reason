@@ -14,9 +14,9 @@ type cardValue =
   | Eight
   | Nine
   | Ten
-  | K
-  | Q
   | J
+  | Q
+  | K
   | A;
 
 type card = {
@@ -82,6 +82,41 @@ let contains = (element, list) => {
 let get_first_card = (~deck: list(card), ~blocklist) => {
   List.find(card => !contains(card.number, blocklist), deck);
 };
+
+
+let suits = [Hearts, Diamonds, Spades, Flowers];
+
+let values = [
+  Two,
+  Three,
+  Four,
+  Five,
+  Six,
+  Seven,
+  Eight,
+  Nine,
+  Ten,
+  J,
+  Q,
+  K,
+  A,
+];
+
+let cartesianProduct = (suits, values) => {
+  List.concat(
+    List.map(
+      x => {
+        List.map(
+          y => {suit: x, number: y},
+          values,
+        )
+      },
+      suits,
+    ),
+  );
+};
+
+let create_deck = () => cartesianProduct(suits, values);
 
 let transition = (action, state: state) =>
   switch (state.status) {
