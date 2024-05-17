@@ -21,7 +21,7 @@ type cardValue =
 
 type card = {
   suit,
-  number: string,
+  number: cardValue,
 };
 
 type deck = list(card);
@@ -29,13 +29,6 @@ type deck = list(card);
 type player = {
   cards: deck,
   name: string,
-};
-
-type gameRules = {
-  start_cards_blocklist: list(cardValue),
-  finishing_cards: list(cardValue),
-  num_players: int,
-  cards_to_deal: int,
 };
 
 type action =
@@ -60,27 +53,34 @@ type gameStatus =
 
 type state = {
   status: gameStatus,
-  rules: gameRules,
+  start_cards_blocklist: list(cardValue),
+  finishing_cards: list(cardValue),
+  cards_to_deal: int,
+  num_players: int,
   players: list(player),
   deck: list(card),
-  played: list(card),
+  played_stack: list(card),
   player_turn: int,
-};
-
-let defaultRules = {
-  start_cards_blocklist: [K, Q, J, A, Two, Three, Eight],
-  finishing_cards: [A, Two, Three, Four, Five, Six, Seven, Nine, Ten],
-  num_players: 2,
-  cards_to_deal: 4,
 };
 
 let initialState = {
   status: NotStarted,
-  rules: defaultRules,
+  num_players: 2,
   players: [],
   deck: [],
-  played: [],
+  played_stack: [],
   player_turn: 0,
+  start_cards_blocklist: [K, Q, J, A, Two, Three, Eight],
+  finishing_cards: [A, Two, Three, Four, Five, Six, Seven, Nine, Ten],
+  cards_to_deal: 4,
+};
+
+let contains = (element, list) => {
+  List.exists(x => x == element, list);
+};
+
+let get_first_card = (~deck: list(card), ~blocklist) => {
+  List.find(card => !contains(card.number, blocklist), deck);
 };
 
 let transition = (action, state: state) =>
@@ -90,10 +90,7 @@ let transition = (action, state: state) =>
     | Start(num_players) when num_players >= 2 => {
         ...state,
         status: Lobby,
-        rules: {
-          ...state.rules,
-          num_players,
-        },
+        num_players,
       }
     | _ => state
     }
@@ -108,7 +105,7 @@ let transition = (action, state: state) =>
         List.rev([new_player, ...existing_players]);
       };
       let new_status =
-        List.length(updated_players) < state.rules.num_players
+        List.length(updated_players) < state.num_players
           ? Lobby : AwaitingDeck;
 
       {...state, players: updated_players, status: new_status};
@@ -126,16 +123,19 @@ let transition = (action, state: state) =>
     }
   | AwaitingPlayerCards =>
     switch (action) {
-    | DealPlayerCards => 
-    {
-        ...state,
-        status: AwaitingStartCard,
-      }
+    | DealPlayerCards => {...state, status: AwaitingStartCard}
     | _ => state
     }
   | AwaitingStartCard =>
     switch (action) {
-    | DealStartCard => Live
+    | DealStartCard =>
+      let start_card =
+        get_first_card(
+          ~deck=state.deck,
+          ~blocklist=state.start_cards_blocklist,
+        );
+      let remaining_deck = List.filter(x => x != start_card, state.deck);
+      {...state, status: Live, deck: remaining_deck, played_stack: [start_card]};
     | _ => state
     }
   | Live =>
