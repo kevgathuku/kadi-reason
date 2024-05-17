@@ -1,2 +1,3 @@
-(* Print a msg from a reason lib *)
-print_endline Lib.Hello.normal_greeting
+print_endline
+  (String.concat " "
+     [ "Start Deck Length:"; string_of_int (List.length Lib.Hello.deck) ])
