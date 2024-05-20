@@ -1,0 +1,5 @@
+(executable
+ (name test)
+ (libraries base ounit2 lib str)
+ (preprocess
+  (pps ppx_inline_test ppx_assert)))
