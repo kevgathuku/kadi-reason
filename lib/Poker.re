@@ -24,6 +24,14 @@ type card = {
   number: cardValue,
 };
 
+// Game constants
+let min_players = 2;
+let max_players = 5;
+let cards_to_deal = 4;
+
+let start_cards_blocklist: list(cardValue) = [K, Q, J, A, Two, Three, Eight];
+let finish_cards_blocklist: list(cardValue) = [K, Q, J, Two, Three, Eight];
+
 type deck = list(card);
 
 type player = {
@@ -53,9 +61,6 @@ type gameStatus =
 
 type state = {
   status: gameStatus,
-  start_cards_blocklist: list(cardValue),
-  finishing_cards: list(cardValue),
-  cards_to_deal: int,
   num_players: int,
   players: list(player),
   deck: list(card),
@@ -65,14 +70,11 @@ type state = {
 
 let initialState = {
   status: NotStarted,
-  num_players: 2,
+  num_players: 0,
   players: [],
   deck: [],
   played_stack: [],
   player_turn: 0,
-  start_cards_blocklist: [K, Q, J, A, Two, Three, Eight],
-  finishing_cards: [A, Two, Three, Four, Five, Six, Seven, Nine, Ten],
-  cards_to_deal: 4,
 };
 
 let contains = (element, list) => {
@@ -82,7 +84,6 @@ let contains = (element, list) => {
 let get_first_card = (~deck: list(card), ~blocklist) => {
   List.find(card => !contains(card.number, blocklist), deck);
 };
-
 
 let suits = [Hearts, Diamonds, Spades, Flowers];
 
@@ -104,15 +105,7 @@ let values = [
 
 let cartesianProduct = (suits, values) => {
   List.concat(
-    List.map(
-      x => {
-        List.map(
-          y => {suit: x, number: y},
-          values,
-        )
-      },
-      suits,
-    ),
+    List.map(x => {List.map(y => {suit: x, number: y}, values)}, suits),
   );
 };
 
@@ -122,7 +115,8 @@ let transition = (action, state: state) =>
   switch (state.status) {
   | NotStarted =>
     switch (action) {
-    | Start(num_players) when num_players >= 2 => {
+    | Start(num_players)
+        when num_players >= min_players && num_players <= max_players => {
         ...state,
         status: Lobby,
         num_players,
@@ -140,7 +134,8 @@ let transition = (action, state: state) =>
         List.rev([new_player, ...existing_players]);
       };
       let new_status =
-        List.length(updated_players) < state.num_players
+        List.length(updated_players) < min_players
+        || List.length(updated_players) > max_players
           ? Lobby : AwaitingDeck;
 
       {...state, players: updated_players, status: new_status};
@@ -167,7 +162,7 @@ let transition = (action, state: state) =>
       let start_card =
         get_first_card(
           ~deck=state.deck,
-          ~blocklist=state.start_cards_blocklist,
+          ~blocklist=start_cards_blocklist,
         );
       let remaining_deck = List.filter(x => x != start_card, state.deck);
       {
