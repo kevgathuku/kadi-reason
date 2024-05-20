@@ -160,10 +160,7 @@ let transition = (action, state: state) =>
     switch (action) {
     | DealStartCard =>
       let start_card =
-        get_first_card(
-          ~deck=state.deck,
-          ~blocklist=start_cards_blocklist,
-        );
+        get_first_card(~deck=state.deck, ~blocklist=start_cards_blocklist);
       let remaining_deck = List.filter(x => x != start_card, state.deck);
       {
         ...state,

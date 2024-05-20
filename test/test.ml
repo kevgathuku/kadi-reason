@@ -14,7 +14,8 @@ let test_start_game =
              (transition (Start 2) initialState :> Lib.Poker.state).status );
          ( "invalid action" >:: fun _ ->
            assert_equal NotStarted
-             (transition DealPlayerCards initialState :> Lib.Poker.state).status );
+             (transition DealPlayerCards initialState :> Lib.Poker.state).status
+         );
        ]
 
 let _ = run_test_tt_main test_start_game
