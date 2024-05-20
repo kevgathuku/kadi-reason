@@ -25,3 +25,8 @@ dev-deps:
 .PHONY: run
 run:
 	dune exec ./bin/main.exe
+
+# Run the tests
+.PHONY: test
+test:
+	dune exec test/test.exe
