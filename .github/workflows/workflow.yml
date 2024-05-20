@@ -46,4 +46,6 @@ jobs:
         with:
           ocaml-compiler: "5.1"
 
+      - run: opam install . --deps-only
+
       - uses: ocaml/setup-ocaml/lint-fmt@v2

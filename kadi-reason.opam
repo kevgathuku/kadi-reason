@@ -29,7 +29,7 @@ depends: [
   "ocaml-lsp-server"
   "reason"
   "utop"
-  "ounit2"
+  "ounit2" {with-test}
   "ocamlformat"
   "merlin-extend"
   "ppx_inline_test" { >= "0.16.0" }
